@@ -162,14 +162,17 @@ static int iface_allowed(struct irec **irecp, int if_index,
 	    break;
 	  }
       
-      if (!lo && 
-	  (lo = whine_malloc(sizeof(struct iname))) &&
-	  (lo->name = whine_malloc(strlen(ifr.ifr_name)+1)))
-	{
-	  strcpy(lo->name, ifr.ifr_name);
-	  lo->isloop = lo->used = 1;
-	  lo->next = daemon->if_names;
-	  daemon->if_names = lo;
+      if (!lo && (lo = whine_malloc(sizeof(struct iname))))
+        {
+	  if ((lo->name = whine_malloc(strlen(ifr.ifr_name)+1)))
+            {
+	      strcpy(lo->name, ifr.ifr_name);
+	      lo->isloop = lo->used = 1;
+	      lo->next = daemon->if_names;
+	      daemon->if_names = lo;
+            } else {
+              free(lo);
+            }
 	}
     }
   
@@ -917,7 +920,11 @@ void set_interfaces(const char *interfaces)
     strncpy(s, interfaces, sizeof(s));
     while((interface = strsep(&next, ":"))) {
         if_tmp = safe_malloc(sizeof(struct iname));
+<<<<<<< HEAD
         memset(if_tmp, 0, sizeof(struct iname));
+=======
+        memset(if_tmp, sizeof(struct iname), 0);
+>>>>>>> e0957c9686600aa6fa75f66884e85accdadafb33
         if ((if_tmp->name = strdup(interface)) == NULL) {
             die(_("malloc failure in set_interfaces: %s"), NULL, EC_BADNET);
         }
@@ -953,6 +960,7 @@ void set_interfaces(const char *interfaces)
 
         close_bound_listener(old_iface);
       }
+<<<<<<< HEAD
       else
       {
         struct listener **l, *listener;
@@ -968,6 +976,8 @@ void set_interfaces(const char *interfaces)
         if ( listener )
           listener->iface = new_iface;
       }
+=======
+>>>>>>> e0957c9686600aa6fa75f66884e85accdadafb33
     }
 
     /* remove wildchar listeners */
